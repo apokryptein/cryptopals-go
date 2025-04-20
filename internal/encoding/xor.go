@@ -1,30 +1,19 @@
 package encoding
 
 import (
-	"encoding/hex"
 	"fmt"
 )
 
 // XORs two buffer of equal length
-func FixedXOR(buf1 string, buf2 string) (string, error) {
+func FixedXOR(buf1, buf2 []byte) ([]byte, error) {
 	if len(buf1) != len(buf2) {
-		return "", fmt.Errorf("buffer lengths differ")
-	}
-
-	buf1Bytes, err := hex.DecodeString(buf1)
-	if err != nil {
-		return "", fmt.Errorf("error decoding hex: %w", err)
-	}
-
-	buf2Bytes, err := hex.DecodeString(buf2)
-	if err != nil {
-		return "", fmt.Errorf("error decoding hex: %w", err)
+		return nil, fmt.Errorf("buffer lengths differ")
 	}
 
 	var xorResult []byte
-	for i := range buf1Bytes {
-		xorResult = append(xorResult, buf1Bytes[i]^buf2Bytes[i])
+	for i := range buf1 {
+		xorResult = append(xorResult, buf1[i]^buf2[i])
 	}
 
-	return hex.EncodeToString(xorResult), nil
+	return xorResult, nil
 }
