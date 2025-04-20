@@ -8,14 +8,14 @@ import (
 )
 
 func main() {
-	messageEnc := "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
-	key, message, score, err := set1.Challenge03(messageEnc)
+	filePath := "./testdata/set1-challenge04_data.txt"
+
+	encData, decData, key, err := set1.Challenge04(filePath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v", err)
-		os.Exit(1)
+		fmt.Fprintf(os.Stderr, "%v\n", err)
 	}
 
-	fmt.Printf("Message: %s\n", message)
+	fmt.Printf("Encrypted: %s\n", encData)
+	fmt.Printf("Decrypted: %s\n", decData)
 	fmt.Printf("Key: %s\n", key)
-	fmt.Printf("Score: %f\n", score)
 }

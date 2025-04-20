@@ -1,8 +1,6 @@
 package set1_test
 
 import (
-	"fmt"
-	"os"
 	"testing"
 
 	"github.com/apokryptein/cryptopals-go/internal/set1"
@@ -15,8 +13,7 @@ func TestChallenge03(t *testing.T) {
 
 	gotKey, gotMessage, _, err := set1.Challenge03(messageEnc)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v", err)
-		os.Exit(1)
+		t.Errorf("unexpected error: %v\n", err)
 	}
 
 	if gotMessage != wantMessage && gotKey != wantKey {
