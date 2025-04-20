@@ -28,14 +28,3 @@ func FixedXOR(buf1 string, buf2 string) (string, error) {
 
 	return hex.EncodeToString(xorResult), nil
 }
-
-// XORs a buffer with a single byte key
-func FixedSingleByteXOR(message []byte, key byte) ([]byte, error) {
-	xorResult := make([]byte, len(message))
-
-	for _, b := range message {
-		xorResult = append(xorResult, b^key)
-	}
-
-	return xorResult, nil
-}

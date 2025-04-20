@@ -1,21 +1,14 @@
 package cryptanalysis
 
 import (
-	"encoding/hex"
 	"fmt"
 	"strings"
 
-	"github.com/apokryptein/cryptopals-go/internal/encoding"
+	"github.com/apokryptein/cryptopals-go/internal/crypto"
 )
 
 // Brute forces a message enncoded/encrypted using single byte XOR using frequency analysis
-func BruteSingleByteXOR(message string) (goodKey byte, goodMessage []byte, goodScore float64, err error) {
-	// Decode hex string to bytes
-	messageBytes, err := hex.DecodeString(message)
-	if err != nil {
-		return 0, nil, 0, fmt.Errorf("error decoding hex string: %w", err)
-	}
-
+func BruteSingleByteXOR(message []byte) (goodKey byte, goodMessage []byte, goodScore float64, err error) {
 	// Score variable
 	var maxScore float64 = -1
 
@@ -25,7 +18,7 @@ func BruteSingleByteXOR(message string) (goodKey byte, goodMessage []byte, goodS
 		key := byte(k)
 
 		// Get XOR'd value
-		xorResult, err := encoding.FixedSingleByteXOR(messageBytes, key)
+		xorResult, err := crypto.SingleByteXOR(message, key)
 		if err != nil {
 			return 0, nil, 0, fmt.Errorf("error xoring message: %w", err)
 		}

@@ -25,7 +25,7 @@ func Challenge04(filePath string) (encData string, decData string, key string, e
 	// Instantiate new scanner
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		key, message, score, err := cryptanalysis.BruteSingleByteXOR(scanner.Text())
+		key, message, score, err := cryptanalysis.BruteSingleByteXOR([]byte(scanner.Text()))
 		if err != nil {
 			return "", "", "", fmt.Errorf("error bruteforcing message: %w", err)
 		}
