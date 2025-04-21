@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bufio"
-	"encoding/hex"
 	"fmt"
 	"os"
 
@@ -10,30 +8,14 @@ import (
 )
 
 func main() {
-	file, err := os.Open("./testdata/set1-challenge08_data.txt")
+	key := "YELLOW SUBMARINE"
+
+	newKey, err := crypto.PaddingPKCS7([]byte(key), 25)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: %v\n", err)
 		os.Exit(1)
-
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	var line string
-
-	for scanner.Scan() {
-		data, err := hex.DecodeString(scanner.Text())
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error decoding hex: %v\n", err)
-			os.Exit(1)
-		}
-
-		good := crypto.DetectAES_ECB(data, 16)
-
-		if good {
-			line = scanner.Text()
-		}
 	}
 
-	fmt.Println(line)
+	fmt.Printf("New Key: |%s|\n", string(newKey))
+	fmt.Printf("%x\n", newKey)
 }
