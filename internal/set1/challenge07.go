@@ -1,4 +1,4 @@
-package main
+package set1
 
 import (
 	"encoding/base64"
@@ -9,24 +9,21 @@ import (
 	"github.com/apokryptein/cryptopals-go/internal/crypto"
 )
 
-func main() {
-	data, err := os.ReadFile("./testdata/set1-challenge07_data.txt")
+func Challenge07(filePath string) (string, error) {
+	data, err := os.ReadFile(filePath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
-
+		return "", fmt.Errorf("error reading file: %w", err)
 	}
 
 	cleanData := strings.ReplaceAll(string(data), "\n", "")
 	decodedData, err := base64.StdEncoding.DecodeString(cleanData)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
+		return "", fmt.Errorf("error decoding data: %w", err)
 	}
 
 	key := "YELLOW SUBMARINE"
 
-	plaintext, _ := crypto.DecryptAES([]byte(key), decodedData)
+	pyBytes, _ := crypto.DecryptAES([]byte(key), decodedData)
 
-	fmt.Println(string(plaintext))
+	return string(pyBytes), nil
 }
