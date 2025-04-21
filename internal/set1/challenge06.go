@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/apokryptein/cryptopals-go/internal/cryptanalysis"
 )
 
 func Challenge06(filePath string) (key string, plaintext string, err error) {
@@ -12,14 +14,17 @@ func Challenge06(filePath string) (key string, plaintext string, err error) {
 	if err != nil {
 		return "", "", fmt.Errorf("error reading file: %w", err)
 	}
+
 	cleanData := strings.ReplaceAll(string(data), "\n", "")
 	decodedData, err := base64.StdEncoding.DecodeString(cleanData)
 	if err != nil {
 		return "", "", fmt.Errorf("error decoding base64 string: %w", err)
 	}
 
-	// TODO: complete challenge
-	fmt.Println(string(decodedData))
+	keyBytes, pTextBytes, err := cryptanalysis.BreakRepeatingKeyXOR(decodedData)
+	if err != nil {
+		return "", "", fmt.Errorf("Challenge06: %v", err)
+	}
 
-	return "", "", nil
+	return string(keyBytes), string(pTextBytes), nil
 }

@@ -22,3 +22,8 @@ func HammingDistance(b1, b2 []byte) (int, error) {
 
 	return hammingDistance, nil
 }
+
+// Normalizes HammingDistance
+func NormalizeDistance(distance, keySize int) float64 {
+	return float64(distance) / float64(keySize)
+}
