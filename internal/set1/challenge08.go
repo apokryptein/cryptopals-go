@@ -1,4 +1,4 @@
-package main
+package set1
 
 import (
 	"bufio"
@@ -9,12 +9,10 @@ import (
 	"github.com/apokryptein/cryptopals-go/internal/crypto"
 )
 
-func main() {
-	file, err := os.Open("./testdata/set1-challenge08_data.txt")
+func Challenge08(filePath string) (string, error) {
+	file, err := os.Open(filePath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
-
+		return "", fmt.Errorf("error opening file: %w", err)
 	}
 	defer file.Close()
 
@@ -24,8 +22,7 @@ func main() {
 	for scanner.Scan() {
 		data, err := hex.DecodeString(scanner.Text())
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "error decoding hex: %v\n", err)
-			os.Exit(1)
+			return "", fmt.Errorf("error decoding string: %w", err)
 		}
 
 		good := crypto.DetectAES_ECB(data, 16)
@@ -35,5 +32,5 @@ func main() {
 		}
 	}
 
-	fmt.Println(line)
+	return line, nil
 }

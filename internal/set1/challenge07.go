@@ -23,7 +23,7 @@ func Challenge07(filePath string) (string, error) {
 
 	key := "YELLOW SUBMARINE"
 
-	pyBytes, _ := crypto.DecryptAES([]byte(key), decodedData)
+	pyBytes, _ := crypto.DecryptAES_ECB([]byte(key), decodedData)
 
 	return string(pyBytes), nil
 }
