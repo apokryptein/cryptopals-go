@@ -60,24 +60,18 @@ func DetectAES_ECB(data []byte, blockSize int) bool {
 }
 
 func DecryptAES_CBC(key, iv, data []byte) ([]byte, error) {
-	var err error
-
 	// Check ciphertext is of sufficient length
 	if len(data) < aes.BlockSize {
 		return nil, fmt.Errorf("ciphertext too short")
 	}
 
 	// Ensure ciphertext is multiple of blocksize
-	// If not, pad with PKCS7
 	if len(data)%aes.BlockSize != 0 {
-		data, err = PaddingPKCS7(data, aes.BlockSize)
-		if err != nil {
-			return nil, fmt.Errorf("error padding data: %w", err)
-		}
+		return nil, fmt.Errorf("ciphertext not multiple of blocksize")
 	}
 
 	previousBlock := iv
-	plaintext := make([]byte, len(data))
+	plaintext := make([]byte, 0, len(data))
 
 	for i := 0; i < len(data); i += aes.BlockSize {
 		// Get current block
@@ -103,4 +97,50 @@ func DecryptAES_CBC(key, iv, data []byte) ([]byte, error) {
 	}
 
 	return plaintext, nil
+}
+
+func EncryptAES_CBC(key, iv, data []byte) ([]byte, error) {
+	var err error
+
+	// Check ciphertext is of sufficient length
+	if len(data) < aes.BlockSize {
+		return nil, fmt.Errorf("ciphertext too short")
+	}
+
+	// Ensure ciphertext is multiple of blocksize
+	// If not, pad with PKCS7
+	if len(data)%aes.BlockSize != 0 {
+		fmt.Println("Padding data...")
+		data, err = PaddingPKCS7(data, aes.BlockSize)
+		if err != nil {
+			return nil, fmt.Errorf("error padding data: %w", err)
+		}
+	}
+
+	previousBlock := iv
+	ciphertext := make([]byte, 0, len(data))
+
+	for i := 0; i < len(data); i += aes.BlockSize {
+		// Get current block
+		currentBlock := data[i : i+aes.BlockSize]
+
+		xBlock, err := encoding.FixedXOR(currentBlock, previousBlock)
+		if err != nil {
+			return nil, fmt.Errorf("error xoring block: %w", err)
+		}
+
+		// Encrypt current block
+		encData, err := EncryptAES_ECB(key, xBlock)
+		if err != nil {
+			return nil, fmt.Errorf("error decrypting block: %w", err)
+		}
+
+		// previousBlock is current endcrypted block
+		previousBlock = encData
+
+		// Append encrypted block to ciphertext
+		ciphertext = append(ciphertext, encData...)
+	}
+
+	return ciphertext, nil
 }
