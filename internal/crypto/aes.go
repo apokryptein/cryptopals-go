@@ -7,6 +7,7 @@ import (
 	"github.com/apokryptein/cryptopals-go/internal/encoding"
 )
 
+// Implements AES Electronic Code Block (ECB) decryption
 func DecryptAES_ECB(key, data []byte) ([]byte, error) {
 	cipher, err := aes.NewCipher(key)
 	if err != nil {
@@ -22,6 +23,7 @@ func DecryptAES_ECB(key, data []byte) ([]byte, error) {
 	return ptBytes, nil
 }
 
+// Implements AES Electronic Code Block (ECB) encryption
 func EncryptAES_ECB(key, data []byte) ([]byte, error) {
 	cipher, err := aes.NewCipher(key)
 	if err != nil {
@@ -37,15 +39,20 @@ func EncryptAES_ECB(key, data []byte) ([]byte, error) {
 	return ptBytes, nil
 }
 
+// Detects whether ciphertext has been encrypted with AES ECB
 func DetectAES_ECB(data []byte, blockSize int) bool {
+	// Must have at least two blocks for validation
 	if len(data) < 2*blockSize {
 		return false
 	}
 
+	// Numnber of blocks in ciphertext
 	nBlocks := len(data) / blockSize
 
+	// Map storing whether a previous block has been seen
 	seen := make(map[[16]byte]struct{}, nBlocks)
 
+	// Iterate through blocks to check for duplicates
 	for i := range nBlocks {
 		var block [16]byte
 
@@ -59,6 +66,8 @@ func DetectAES_ECB(data []byte, blockSize int) bool {
 	return false
 }
 
+// Impelements AES Cipher Block Chaining (CBC) Decryption
+// Employs DecryptAES_ECB function
 func DecryptAES_CBC(key, iv, data []byte) ([]byte, error) {
 	// Check ciphertext is of sufficient length
 	if len(data) < aes.BlockSize {
@@ -70,7 +79,10 @@ func DecryptAES_CBC(key, iv, data []byte) ([]byte, error) {
 		return nil, fmt.Errorf("ciphertext not multiple of blocksize")
 	}
 
+	// Initial previous block is IV
 	previousBlock := iv
+
+	// Instantiate slice to house plaintext
 	plaintext := make([]byte, 0, len(data))
 
 	for i := 0; i < len(data); i += aes.BlockSize {
@@ -99,13 +111,10 @@ func DecryptAES_CBC(key, iv, data []byte) ([]byte, error) {
 	return plaintext, nil
 }
 
+// Impelements AES Cipher Block Chaining (CBC) Encryption
+// Employs EncryptAES_ECB function
 func EncryptAES_CBC(key, iv, data []byte) ([]byte, error) {
 	var err error
-
-	// Check ciphertext is of sufficient length
-	if len(data) < aes.BlockSize {
-		return nil, fmt.Errorf("ciphertext too short")
-	}
 
 	// Ensure ciphertext is multiple of blocksize
 	// If not, pad with PKCS7
@@ -117,7 +126,10 @@ func EncryptAES_CBC(key, iv, data []byte) ([]byte, error) {
 		}
 	}
 
+	// Initial previous block is IV
 	previousBlock := iv
+
+	// Instantiate slice to house ciphertext
 	ciphertext := make([]byte, 0, len(data))
 
 	for i := 0; i < len(data); i += aes.BlockSize {

@@ -1,4 +1,4 @@
-package main
+package set2
 
 import (
 	"bytes"
@@ -10,29 +10,27 @@ import (
 	"github.com/apokryptein/cryptopals-go/internal/crypto"
 )
 
-func main() {
+func Challenge10(filePath string) ([]byte, error) {
 	key := "YELLOW SUBMARINE"
 
-	data, err := os.ReadFile("./testdata/set2-challenge10_data.txt")
+	data, err := os.ReadFile(filePath)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error opening file: %v\n", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("error opening file: %w", err)
 	}
 
 	cleanData := strings.ReplaceAll(string(data), "\n", "")
 	decData, err := base64.StdEncoding.DecodeString(cleanData)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error decoding hex: %v\n", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("error decoding hex: %w", err)
 	}
 
+	// Manually set IV to 16 null bytes as per challenge instructions
 	iv := bytes.Repeat([]byte("0"), 16)
 
 	pt, err := crypto.DecryptAES_CBC([]byte(key), iv, []byte(decData))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error decrypting data: %v\n", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("error decrypting data: %w", err)
 	}
 
-	fmt.Println(string(pt))
+	return pt, nil
 }

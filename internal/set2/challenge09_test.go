@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	set2 "github.com/apokryptein/cryptopals-go/internal"
+	"github.com/apokryptein/cryptopals-go/internal/set2"
 )
 
 func TestChallenge09(t *testing.T) {
