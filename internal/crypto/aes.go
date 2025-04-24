@@ -9,6 +9,11 @@ import (
 
 // Implements AES Electronic Code Block (ECB) decryption
 func DecryptAES_ECB(key, data []byte) ([]byte, error) {
+	// Ensure ciphertext is multiple of blocksize
+	if len(data)%aes.BlockSize != 0 {
+		return nil, fmt.Errorf("ciphertext not multiple of blocksize")
+	}
+
 	cipher, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new cipher: %w", err)
@@ -28,6 +33,15 @@ func EncryptAES_ECB(key, data []byte) ([]byte, error) {
 	cipher, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new cipher: %w", err)
+	}
+
+	// Ensure ciphertext is multiple of blocksize
+	// If not, pad with PKCS7
+	if len(data)%aes.BlockSize != 0 {
+		data, err = PaddingPKCS7(data, aes.BlockSize)
+		if err != nil {
+			return nil, fmt.Errorf("error padding data: %w", err)
+		}
 	}
 
 	ptBytes := make([]byte, len(data))
@@ -92,7 +106,6 @@ func EncryptAES_CBC(key, iv, data []byte) ([]byte, error) {
 	// Ensure ciphertext is multiple of blocksize
 	// If not, pad with PKCS7
 	if len(data)%aes.BlockSize != 0 {
-		fmt.Println("Padding data...")
 		data, err = PaddingPKCS7(data, aes.BlockSize)
 		if err != nil {
 			return nil, fmt.Errorf("error padding data: %w", err)
