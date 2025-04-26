@@ -1,24 +1,27 @@
 package main
 
 import (
+	"bytes"
 	"crypto/aes"
-	"encoding/hex"
 	"fmt"
 
 	"github.com/apokryptein/cryptopals-go/internal/cryptanalysis"
 )
 
 func main() {
-	pt := "This is a test string to see if this things works. Or not..."
-	s, _ := cryptanalysis.EncryptionOracle([]byte(pt))
-	fmt.Println(hex.EncodeToString(s))
+	const numTests = 1000
+	var correctDetections int
 
-	result := cryptanalysis.DetectAES_ECB(s, aes.BlockSize)
-	fmt.Println(result)
+	for range numTests {
+		pt := bytes.Repeat([]byte("A"), 128)
 
-	if result {
-		fmt.Println("Is ECB")
-	} else {
-		fmt.Println("Is CBC")
+		ct, mode, _ := cryptanalysis.EncryptionOracle([]byte(pt))
+		result := cryptanalysis.DetectAES_ECB(ct, aes.BlockSize)
+
+		if (mode == "ECB" && result) || (mode == "CBC" && !result) {
+			correctDetections++
+		}
 	}
+
+	fmt.Printf("Accuracy: %d/%d (%.2f%%)\n", correctDetections, numTests, (float64(correctDetections)/float64(numTests))*100)
 }

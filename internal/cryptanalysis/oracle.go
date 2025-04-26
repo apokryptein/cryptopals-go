@@ -11,7 +11,7 @@ import (
 
 // Encrypts data using either AES ECB or AES CBC
 // randomly selected
-func EncryptionOracle(plaintext []byte) ([]byte, error) {
+func EncryptionOracle(plaintext []byte) ([]byte, string, error) {
 	// Generate random 16-byte key
 	key := make([]byte, aes.BlockSize)
 	rand.Read(key)
@@ -34,24 +34,29 @@ func EncryptionOracle(plaintext []byte) ([]byte, error) {
 
 	var ciphertext []byte
 	var err error
+	var mode string
 
 	if selection == 1 {
-		fmt.Println("CBC")
+		// Set mode
+		mode = "CBC"
+
 		// Generate random IV
 		iv := make([]byte, aes.BlockSize)
 		rand.Read(iv)
 
 		ciphertext, err = crypto.EncryptAES_CBC(key, iv, ptBytes)
 		if err != nil {
-			return nil, fmt.Errorf("error during AES-CBC encryption: %w", err)
+			return nil, "", fmt.Errorf("error during AES-CBC encryption: %w", err)
 		}
 	} else {
-		fmt.Println("ECB")
+		// Set mode
+		mode = "ECB"
+
 		ciphertext, err = crypto.EncryptAES_ECB(key, ptBytes)
 		if err != nil {
-			return nil, fmt.Errorf("error during AES-ECB encryption: %w", err)
+			return nil, "", fmt.Errorf("error during AES-ECB encryption: %w", err)
 		}
 	}
 
-	return ciphertext, nil
+	return ciphertext, mode, nil
 }
