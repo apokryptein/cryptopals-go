@@ -8,8 +8,14 @@ import (
 )
 
 func Challenge11(pt []byte) (mode string, result bool, err error) {
+	// Instantiate new oracle
+	oracle, err := cryptanalysis.NewOracle(cryptanalysis.ModeRandom)
+	if err != nil {
+		return "", false, fmt.Errorf("oracle creation failed: %w", err)
+	}
+
 	// Call oracle
-	ct, mode, err := cryptanalysis.EncryptionOracle([]byte(pt), cryptanalysis.Random)
+	ct, modeUsed, err := oracle(pt)
 	if err != nil {
 		return "", false, fmt.Errorf("oracle failed: %w", err)
 	}
@@ -17,5 +23,5 @@ func Challenge11(pt []byte) (mode string, result bool, err error) {
 	// Detect
 	result = cryptanalysis.DetectAES_ECB(ct, aes.BlockSize)
 
-	return mode, result, nil
+	return modeUsed.String(), result, nil
 }

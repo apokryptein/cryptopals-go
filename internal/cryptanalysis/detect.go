@@ -27,3 +27,5 @@ func DetectAES_ECB(data []byte, blockSize int) bool {
 	}
 	return false
 }
+
+func DetectBlocksize() {}

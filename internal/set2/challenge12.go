@@ -22,8 +22,15 @@ func Challenge12() ([]byte, error) {
 	// append data to initial buffer
 	pt = append(pt, appendBytes...)
 
-	// Encrypt it -> ECB
-	ct, _, _ := cryptanalysis.EncryptionOracle([]byte(pt), cryptanalysis.ECB)
+	// Instantiate Oracle
+	oracle, err := cryptanalysis.NewOracle(cryptanalysis.ModeECB)
+	if err != nil {
+		return nil, fmt.Errorf("oracle creation failed: %w", err)
+	}
 
+	// Encrypt
+	ct, _, _ := oracle([]byte(pt))
+
+	// return ct, nil
 	return ct, nil
 }

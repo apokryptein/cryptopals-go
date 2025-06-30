@@ -21,7 +21,7 @@ func TestChallenge11(t *testing.T) {
 		}
 
 		// Evaluate result
-		if (mode == "ECB" && result) || (mode == "CBC" && !result) {
+		if (mode == "ModeECB" && result) || (mode == "ModeCBC" && !result) {
 			correctDetections++
 		} else {
 			t.Logf("Misdetection: mode=%s, detectedECB=%v", mode, result)
