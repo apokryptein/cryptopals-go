@@ -1,3 +1,4 @@
+// Package set2 contains solution to Cryptopal's Set 2 problems
 package set2
 
 import (

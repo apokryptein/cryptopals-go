@@ -1,3 +1,4 @@
+// Package set1 contains solution to Cryptopal's Set 1 problems
 package set1
 
 import (

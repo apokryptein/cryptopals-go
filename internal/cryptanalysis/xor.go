@@ -7,7 +7,7 @@ import (
 	"github.com/apokryptein/cryptopals-go/internal/crypto"
 )
 
-// Brute forces a message enncoded/encrypted using single byte XOR using frequency analysis
+// BruteSingleByteXOR bruteforces a message enncoded/encrypted using single byte XOR using frequency analysis
 func BruteSingleByteXOR(message []byte) (goodKey byte, goodMessage []byte, goodScore float64, err error) {
 	// Score variable
 	var maxScore float64 = -1
@@ -40,7 +40,7 @@ func BruteSingleByteXOR(message []byte) (goodKey byte, goodMessage []byte, goodS
 	return
 }
 
-// Scores a phrase based on letter frequencies in English
+// ScoreEnglish scores a phrase based on letter frequencies in English
 func ScoreEnglish(message []byte) (float64, error) {
 	// Letter frequencies: https://www.programming-algorithms.net/article/40379/Letter-frequency-English
 	englishFrequencies := map[rune]float64{

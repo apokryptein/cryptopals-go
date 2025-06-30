@@ -1,27 +1,26 @@
 package main
 
 import (
-	"bytes"
 	"crypto/aes"
 	"fmt"
+	"os"
 
 	"github.com/apokryptein/cryptopals-go/internal/cryptanalysis"
+	"github.com/apokryptein/cryptopals-go/internal/set2"
 )
 
 func main() {
-	const numTests = 1000
-	var correctDetections int
-
-	for range numTests {
-		pt := bytes.Repeat([]byte("A"), 128)
-
-		ct, mode, _ := cryptanalysis.EncryptionOracle([]byte(pt))
-		result := cryptanalysis.DetectAES_ECB(ct, aes.BlockSize)
-
-		if (mode == "ECB" && result) || (mode == "CBC" && !result) {
-			correctDetections++
-		}
+	// Build and encrypt data for challenge
+	encData, err := set2.Challenge12()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "[ERR] %v", err)
+		os.Exit(1)
 	}
 
-	fmt.Printf("Accuracy: %d/%d (%.2f%%)\n", correctDetections, numTests, (float64(correctDetections)/float64(numTests))*100)
+	// DEBUG
+	if ok := cryptanalysis.DetectAES_ECB(encData, aes.BlockSize); ok {
+		fmt.Println("ECB")
+	} else {
+		fmt.Println("Something's wrong")
+	}
 }

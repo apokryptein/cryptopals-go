@@ -9,7 +9,7 @@ import (
 
 func Challenge11(pt []byte) (mode string, result bool, err error) {
 	// Call oracle
-	ct, mode, err := cryptanalysis.EncryptionOracle([]byte(pt))
+	ct, mode, err := cryptanalysis.EncryptionOracle([]byte(pt), cryptanalysis.Random)
 	if err != nil {
 		return "", false, fmt.Errorf("oracle failed: %w", err)
 	}

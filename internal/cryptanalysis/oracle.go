@@ -9,9 +9,17 @@ import (
 	"github.com/apokryptein/cryptopals-go/internal/crypto"
 )
 
-// Encrypts data using either AES ECB or AES CBC
+type Mode int
+
+const (
+	CBC = iota
+	ECB
+	Random
+)
+
+// EncryptionOracle encrypts data using either AES ECB or AES CBC
 // randomly selected
-func EncryptionOracle(plaintext []byte) ([]byte, string, error) {
+func EncryptionOracle(plaintext []byte, m Mode) ([]byte, string, error) {
 	// Generate random 16-byte key
 	key := make([]byte, aes.BlockSize)
 	rand.Read(key)
@@ -20,7 +28,7 @@ func EncryptionOracle(plaintext []byte) ([]byte, string, error) {
 	randByteNum := mathrand.IntN(6) + 5 // random int 5-10
 	preBytes := make([]byte, randByteNum)
 	appBytes := make([]byte, randByteNum)
-	rand.Read(preBytes)
+	// rand.Read(preBytes)
 	rand.Read(appBytes)
 
 	// Generate new plaintext slice
@@ -36,7 +44,8 @@ func EncryptionOracle(plaintext []byte) ([]byte, string, error) {
 	var err error
 	var mode string
 
-	if selection == 1 {
+	switch m {
+	case CBC:
 		// Set mode
 		mode = "CBC"
 
@@ -48,7 +57,7 @@ func EncryptionOracle(plaintext []byte) ([]byte, string, error) {
 		if err != nil {
 			return nil, "", fmt.Errorf("error during AES-CBC encryption: %w", err)
 		}
-	} else {
+	case ECB:
 		// Set mode
 		mode = "ECB"
 
@@ -56,6 +65,29 @@ func EncryptionOracle(plaintext []byte) ([]byte, string, error) {
 		if err != nil {
 			return nil, "", fmt.Errorf("error during AES-ECB encryption: %w", err)
 		}
+	case Random:
+		if selection == 1 {
+			// Set mode
+			mode = "CBC"
+
+			// Generate random IV
+			iv := make([]byte, aes.BlockSize)
+			rand.Read(iv)
+
+			ciphertext, err = crypto.EncryptAES_CBC(key, iv, ptBytes)
+			if err != nil {
+				return nil, "", fmt.Errorf("error during AES-CBC encryption: %w", err)
+			}
+		} else {
+			// Set mode
+			mode = "ECB"
+
+			ciphertext, err = crypto.EncryptAES_ECB(key, ptBytes)
+			if err != nil {
+				return nil, "", fmt.Errorf("error during AES-ECB encryption: %w", err)
+			}
+		}
+
 	}
 
 	return ciphertext, mode, nil

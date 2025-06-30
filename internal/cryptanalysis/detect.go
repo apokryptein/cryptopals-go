@@ -1,6 +1,7 @@
+// Package cryptanalysis contains function implementing various cryptanalysis techniques
 package cryptanalysis
 
-// Detects whether ciphertext has been encrypted with AES ECB
+// DetectAES_ECB detects whether ciphertext has been encrypted with AES ECB
 func DetectAES_ECB(data []byte, blockSize int) bool {
 	// Must have at least two blocks for validation
 	if len(data) < 2*blockSize {

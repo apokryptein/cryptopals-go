@@ -5,7 +5,7 @@ import (
 	"math/bits"
 )
 
-// Calculate the hamming distance of two byte slices
+// HammingDistance calculates the hamming distance of two byte slices
 func HammingDistance(b1, b2 []byte) (int, error) {
 	// Ensure byte slices are of equal length
 	if len(b1) != len(b2) {
@@ -23,7 +23,7 @@ func HammingDistance(b1, b2 []byte) (int, error) {
 	return hammingDistance, nil
 }
 
-// Normalizes HammingDistance
+// NormalizeDistance normalizes HammingDistance
 func NormalizeDistance(distance, keySize int) float64 {
 	return float64(distance) / float64(keySize)
 }
