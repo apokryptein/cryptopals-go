@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// PaddingPKCS7 implements the PKCS7 padding standard
 func PaddingPKCS7(data []byte, blockSize int) ([]byte, error) {
 	if blockSize <= 0 || blockSize >= 256 {
 		return nil, fmt.Errorf("invalid bock size")

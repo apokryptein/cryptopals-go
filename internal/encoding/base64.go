@@ -1,3 +1,5 @@
+// Package encoding implements various encoding algorithms to provide easy data
+// encoding, decoding, and other useful data transformations
 package encoding
 
 import (
@@ -6,7 +8,7 @@ import (
 	"fmt"
 )
 
-// Take a hex string and returns a base64 encoded string
+// HexToBase64 takes a hex string and returns a base64 encoded string
 func HexToBase64(hexString string) (string, error) {
 	hexBytes, err := hex.DecodeString(hexString)
 	if err != nil {

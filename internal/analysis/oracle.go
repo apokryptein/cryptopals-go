@@ -1,4 +1,4 @@
-package cryptanalysis
+package analysis
 
 import (
 	"crypto/aes"
@@ -91,10 +91,10 @@ func cbcEncrypt(key, pt []byte) ([]byte, error) {
 		return nil, fmt.Errorf("IV gen: %w", err)
 	}
 
-	return crypto.EncryptAES_CBC(key, iv, pt)
+	return crypto.EncryptAESCBC(key, iv, pt)
 }
 
 // AES ECB helper function
 func ecbEncrypt(key, pt []byte) ([]byte, error) {
-	return crypto.EncryptAES_ECB(key, pt)
+	return crypto.EncryptAESECB(key, pt)
 }

@@ -27,7 +27,7 @@ func Challenge10(filePath string) ([]byte, error) {
 	// Manually set IV to 16 null bytes as per challenge instructions
 	iv := bytes.Repeat([]byte("0"), 16)
 
-	pt, err := crypto.DecryptAES_CBC([]byte(key), iv, []byte(decData))
+	pt, err := crypto.DecryptAESCBC([]byte(key), iv, []byte(decData))
 	if err != nil {
 		return nil, fmt.Errorf("error decrypting data: %w", err)
 	}

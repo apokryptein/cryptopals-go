@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/apokryptein/cryptopals-go/internal/cryptanalysis"
+	"github.com/apokryptein/cryptopals-go/internal/analysis"
 )
 
 func Challenge04(filePath string) (encData string, decData string, key string, err error) {
@@ -25,7 +25,7 @@ func Challenge04(filePath string) (encData string, decData string, key string, e
 	// Instantiate new scanner
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		key, message, score, err := cryptanalysis.BruteSingleByteXOR([]byte(scanner.Text()))
+		key, message, score, err := analysis.BruteSingleByteXOR([]byte(scanner.Text()))
 		if err != nil {
 			return "", "", "", fmt.Errorf("error bruteforcing message: %w", err)
 		}

@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-// XORs a buffer with a single byte key
+// SingleByteXOR XORs a buffer with a single byte key
 func SingleByteXOR(message []byte, key byte) ([]byte, error) {
 	xorResult := make([]byte, len(message))
 
@@ -15,7 +15,7 @@ func SingleByteXOR(message []byte, key byte) ([]byte, error) {
 	return xorResult, nil
 }
 
-// XORs a buffer using a repating key
+// RepeatingKeyXOR XORs a buffer using a repating key
 func RepeatingKeyXOR(plaintext []byte, key []byte) ([]byte, error) {
 	if len(key) == 0 {
 		return nil, fmt.Errorf("key must not be empty")

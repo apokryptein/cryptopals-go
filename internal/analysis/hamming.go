@@ -1,4 +1,4 @@
-package cryptanalysis
+package analysis
 
 import (
 	"fmt"

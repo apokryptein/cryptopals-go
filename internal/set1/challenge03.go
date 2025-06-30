@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	cryptanalysis "github.com/apokryptein/cryptopals-go/internal/cryptanalysis"
+	analysis "github.com/apokryptein/cryptopals-go/internal/analysis"
 )
 
 func Challenge03(messageEnc string) (key, message string, score float64, err error) {
@@ -14,7 +14,7 @@ func Challenge03(messageEnc string) (key, message string, score float64, err err
 		return "", "", 0, fmt.Errorf("error decoding hex string: %w", err)
 	}
 
-	keyByte, messageBytes, score, err := cryptanalysis.BruteSingleByteXOR(messageBytes)
+	keyByte, messageBytes, score, err := analysis.BruteSingleByteXOR(messageBytes)
 	if err != nil {
 		return "", "", 0, fmt.Errorf("error bruteforcing message: %w", err)
 	}

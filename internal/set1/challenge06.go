@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/apokryptein/cryptopals-go/internal/cryptanalysis"
+	"github.com/apokryptein/cryptopals-go/internal/analysis"
 )
 
 func Challenge06(filePath string) (key string, plaintext string, err error) {
@@ -21,7 +21,7 @@ func Challenge06(filePath string) (key string, plaintext string, err error) {
 		return "", "", fmt.Errorf("error decoding base64 string: %w", err)
 	}
 
-	keyBytes, pTextBytes, err := cryptanalysis.BreakRepeatingKeyXOR(decodedData)
+	keyBytes, pTextBytes, err := analysis.BreakRepeatingKeyXOR(decodedData)
 	if err != nil {
 		return "", "", fmt.Errorf("Challenge06: %v", err)
 	}

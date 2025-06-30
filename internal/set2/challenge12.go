@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 
-	"github.com/apokryptein/cryptopals-go/internal/cryptanalysis"
+	"github.com/apokryptein/cryptopals-go/internal/analysis"
 )
 
 func Challenge12() ([]byte, error) {
@@ -23,13 +23,32 @@ func Challenge12() ([]byte, error) {
 	pt = append(pt, appendBytes...)
 
 	// Instantiate Oracle
-	oracle, err := cryptanalysis.NewOracle(cryptanalysis.ModeECB)
+	oracle, err := analysis.NewOracle(analysis.ModeECB)
 	if err != nil {
 		return nil, fmt.Errorf("oracle creation failed: %w", err)
 	}
 
+	// Get the blocksize
+	blockSize, err := analysis.DetectBlocksize(oracle)
+	if err != nil {
+		return nil, fmt.Errorf("failed to detect blocksize: %w", err)
+	}
+
+	// DEBUG
+	fmt.Printf("Blocksize: %d\n", blockSize)
+
 	// Encrypt
 	ct, _, _ := oracle([]byte(pt))
+
+	// Check to ensure we are using AES ECB
+	if ok := analysis.DetectAESECB(ct, blockSize); !ok {
+		return nil, fmt.Errorf("oracle is not using AES ECB")
+	} else {
+		// DEBUG
+		fmt.Printf("AES ECB: %v\n", ok)
+	}
+
+	// TODO: impelement Byte at a time ECB decryption function
 
 	// return ct, nil
 	return ct, nil

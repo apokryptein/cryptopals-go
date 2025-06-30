@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/apokryptein/cryptopals-go/internal/cryptanalysis"
+	"github.com/apokryptein/cryptopals-go/internal/analysis"
 )
 
 func Challenge08(filePath string) (string, error) {
@@ -25,7 +25,7 @@ func Challenge08(filePath string) (string, error) {
 			return "", fmt.Errorf("error decoding string: %w", err)
 		}
 
-		good := cryptanalysis.DetectAES_ECB(data, 16)
+		good := analysis.DetectAESECB(data, 16)
 
 		if good {
 			line = scanner.Text()

@@ -1,3 +1,4 @@
+// Package crypto implements various encryption algorithms and helper functions
 package crypto
 
 import (
@@ -7,8 +8,8 @@ import (
 	"github.com/apokryptein/cryptopals-go/internal/encoding"
 )
 
-// Implements AES Electronic Code Block (ECB) decryption
-func DecryptAES_ECB(key, data []byte) ([]byte, error) {
+// DecryptAESECB implements AES Electronic Code Block (ECB) decryption
+func DecryptAESECB(key, data []byte) ([]byte, error) {
 	// Ensure ciphertext is multiple of blocksize
 	if len(data)%aes.BlockSize != 0 {
 		return nil, fmt.Errorf("ciphertext not multiple of blocksize")
@@ -28,8 +29,8 @@ func DecryptAES_ECB(key, data []byte) ([]byte, error) {
 	return ptBytes, nil
 }
 
-// Implements AES Electronic Code Block (ECB) encryption
-func EncryptAES_ECB(key, data []byte) ([]byte, error) {
+// EncryptAESECB implements AES Electronic Code Block (ECB) encryption
+func EncryptAESECB(key, data []byte) ([]byte, error) {
 	cipher, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new cipher: %w", err)
@@ -53,9 +54,9 @@ func EncryptAES_ECB(key, data []byte) ([]byte, error) {
 	return ptBytes, nil
 }
 
-// Impelements AES Cipher Block Chaining (CBC) Decryption
-// Employs DecryptAES_ECB function
-func DecryptAES_CBC(key, iv, data []byte) ([]byte, error) {
+// DecryptAESCBC impelements AES Cipher Block Chaining (CBC) Decryption
+// Employs DecryptAESECB function
+func DecryptAESCBC(key, iv, data []byte) ([]byte, error) {
 	// Check ciphertext is of sufficient length
 	if len(data) < aes.BlockSize {
 		return nil, fmt.Errorf("ciphertext too short")
@@ -77,7 +78,7 @@ func DecryptAES_CBC(key, iv, data []byte) ([]byte, error) {
 		currentBlock := data[i : i+aes.BlockSize]
 
 		// Decrypt current block
-		decData, err := DecryptAES_ECB(key, currentBlock)
+		decData, err := DecryptAESECB(key, currentBlock)
 		if err != nil {
 			return nil, fmt.Errorf("error decrypting block: %w", err)
 		}
@@ -98,9 +99,9 @@ func DecryptAES_CBC(key, iv, data []byte) ([]byte, error) {
 	return plaintext, nil
 }
 
-// Impelements AES Cipher Block Chaining (CBC) Encryption
-// Employs EncryptAES_ECB function
-func EncryptAES_CBC(key, iv, data []byte) ([]byte, error) {
+// EncryptAESCBC impelements AES Cipher Block Chaining (CBC) Encryption
+// Employs EncryptAESECB function
+func EncryptAESCBC(key, iv, data []byte) ([]byte, error) {
 	var err error
 
 	// Ensure ciphertext is multiple of blocksize
@@ -128,7 +129,7 @@ func EncryptAES_CBC(key, iv, data []byte) ([]byte, error) {
 		}
 
 		// Encrypt current block
-		encData, err := EncryptAES_ECB(key, xBlock)
+		encData, err := EncryptAESECB(key, xBlock)
 		if err != nil {
 			return nil, fmt.Errorf("error decrypting block: %w", err)
 		}
