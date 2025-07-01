@@ -9,9 +9,10 @@ import (
 
 func main() {
 	// Build and encrypt data for challenge
-	_, err := set2.Challenge12()
+	data, err := set2.Challenge12()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "[ERR] %v", err)
+		fmt.Fprintf(os.Stderr, "[ERR] %v\n", err)
 		os.Exit(1)
 	}
+	fmt.Println(string(data))
 }

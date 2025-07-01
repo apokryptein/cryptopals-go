@@ -64,3 +64,62 @@ func DetectBlocksize(oracle Oracle) (blockSize int, err error) {
 
 	return 0, fmt.Errorf("failed to detect blocksize after 256 bytes")
 }
+
+// ByteAtATimeECB implements the ECB byte at a time decryption attack
+func ByteAtATimeECB(oracle Oracle, blockSize int, secretLen int) ([]byte, error) {
+	// Make a byte slice of size blockSize to track discovered bytes
+	recovered := make([]byte, 0, secretLen)
+
+	// Loop - number of times is legnth of appended secret
+	for i := range secretLen {
+		// Get current block
+		blockIndex := i / blockSize
+
+		// Calculate prefix pad length
+		padLen := blockSize - 1 - (i % blockSize)
+
+		// Make the basePad
+		prefix := bytes.Repeat([]byte{'A'}, padLen)
+
+		// Create current pad by append recovered bytes to prefix
+		dictPad := append(append([]byte(nil), prefix...), recovered...)
+
+		// Instiate dictionary to track results
+		dictionary := make(map[string]byte)
+
+		// Loop for each possible byte
+		for x := range 256 {
+			// construct test bytes
+			test := append(append([]byte(nil), dictPad...), byte(x))
+
+			// Encrypt test bytes
+			ct, _, _ := oracle(test)
+
+			// get applicable block
+			baseBlock := ct[blockIndex*blockSize : (blockIndex+1)*blockSize]
+
+			// Add to dictionary for this byte
+			dictionary[string(baseBlock)] = byte(x)
+		}
+
+		// Get encrypted bytes of raw prefix for compare
+		rawCT, _, err := oracle(prefix)
+		if err != nil {
+			return nil, fmt.Errorf("oracle error: %w", err)
+		}
+
+		// Get appilcable block
+		realBlk := rawCT[blockIndex*blockSize : (blockIndex+1)*blockSize]
+
+		// See if there's a match in the dictionary
+		b, ok := dictionary[string(realBlk)]
+		if !ok {
+			return nil, fmt.Errorf("could not find byte %d in in dictionary", i)
+		}
+
+		// Add to recovered bytes
+		recovered = append(recovered, b)
+	}
+
+	return recovered, nil
+}

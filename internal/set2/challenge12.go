@@ -23,10 +23,8 @@ func Challenge12() ([]byte, error) {
 	pt = append(pt, appendBytes...)
 
 	// Instantiate Oracle
-	oracle, err := analysis.NewOracle(analysis.ModeECB)
-	if err != nil {
-		return nil, fmt.Errorf("oracle creation failed: %w", err)
-	}
+	// oracle, err := analysis.NewOracle(analysis.ModeECB)
+	oracle := analysis.NewECBOracle(appendBytes)
 
 	// Get the blocksize
 	blockSize, err := analysis.DetectBlocksize(oracle)
@@ -48,8 +46,12 @@ func Challenge12() ([]byte, error) {
 		fmt.Printf("AES ECB: %v\n", ok)
 	}
 
-	// TODO: impelement Byte at a time ECB decryption function
+	// Decrypt using BAAT ECB decryption
+	data, err := analysis.ByteAtATimeECB(oracle, blockSize, len(appendBytes))
+	if err != nil {
+		return nil, fmt.Errorf("byte at a time decryption failed: %w", err)
+	}
 
 	// return ct, nil
-	return ct, nil
+	return data, nil
 }

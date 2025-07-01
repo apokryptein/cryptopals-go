@@ -12,6 +12,7 @@ import (
 // Mode represents the desired AES encryption mode: CBC or ECB
 type Mode int
 
+// AES mode enum
 const (
 	ModeCBC Mode = iota
 	ModeECB
@@ -76,6 +77,22 @@ func NewOracle(m Mode) (Oracle, error) {
 		ciphertext, err := encryptor(key, ptBytes)
 		return ciphertext, chosenMode, err
 	}, nil
+}
+
+// NewECBOracle is an oracle strictly for byte at a time ECB decryption
+// It removes random pre and appended bytes and simply appends the secret suffix
+// prior to encryption
+func NewECBOracle(secretSuffix []byte) Oracle {
+	// generate key
+	key := make([]byte, aes.BlockSize)
+	rand.Read(key)
+
+	// return the simplified oracle closure
+	return func(pt []byte) ([]byte, Mode, error) {
+		data := append(pt, secretSuffix...)
+		ct, err := crypto.EncryptAESECB(key, data)
+		return ct, ModeECB, err
+	}
 }
 
 // String is a helper function that returns the associated string for a given Mode
