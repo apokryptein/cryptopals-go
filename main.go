@@ -8,9 +8,11 @@ import (
 )
 
 func main() {
-	_, err := set2.Challenge13()
+	data, err := set2.Challenge14()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "[!] Challenge 13 failure: %v\n", err)
+		fmt.Fprintf(os.Stderr, "[!] Challenge 14 failure: %v\n", err)
 		os.Exit(1)
 	}
+
+	fmt.Println(string(data))
 }

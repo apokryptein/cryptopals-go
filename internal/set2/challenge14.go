@@ -23,8 +23,14 @@ func Challenge14() ([]byte, error) {
 	pt = append(pt, appendBytes...)
 
 	// Instantiate Oracle
-	// oracle, err := analysis.NewOracle(analysis.ModeECB)
-	oracle := analysis.NewECBOracle(appendBytes)
+	oracle, err := analysis.NewOracle(
+		analysis.WithMode(analysis.ModeECB),
+		analysis.WithRandomPrefix(),
+		analysis.WithSecretSuffix(appendBytes),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create new oracle: %w", err)
+	}
 
 	// Get the blocksize
 	blockSize, err := analysis.DetectBlocksize(oracle)

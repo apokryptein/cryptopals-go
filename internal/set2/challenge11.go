@@ -9,7 +9,7 @@ import (
 
 func Challenge11(pt []byte) (mode string, result bool, err error) {
 	// Instantiate new oracle
-	oracle, err := analysis.NewOracle(analysis.ModeRandom)
+	oracle, err := analysis.NewOracle(analysis.WithMode(analysis.ModeRandom))
 	if err != nil {
 		return "", false, fmt.Errorf("oracle creation failed: %w", err)
 	}

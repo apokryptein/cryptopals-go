@@ -22,37 +22,110 @@ const (
 // Oracle is a closure type acting as the blackbox envryption function
 type Oracle func(pt []byte) (ct []byte, modeUsed Mode, err error)
 
+// OracleOption represents a functional option for configuring
+// an encryption Oracle
+type OracleOption func(*OracleConfig)
+
+// OracleConfig represents configuration details for a given oracle
+type OracleConfig struct {
+	mode         Mode
+	randomPrefix bool
+	randomSuffix bool
+	secretSuffix []byte
+	key          []byte
+}
+
+// WithRandomPrefix is a functional option that sets the
+// OracleConfig to use a random prefix
+func WithRandomPrefix() OracleOption {
+	return func(cfg *OracleConfig) {
+		cfg.randomPrefix = true
+	}
+}
+
+// WithRandomSuffix is a functional option that sets the
+// OracleConfig to use a random suffix
+func WithRandomSuffix() OracleOption {
+	return func(cfg *OracleConfig) {
+		cfg.randomSuffix = true
+	}
+}
+
+// WithSecretSuffix is a functional option that sets the
+// OracleConfig to append a secret suffix
+func WithSecretSuffix(suffix []byte) OracleOption {
+	return func(cfg *OracleConfig) {
+		cfg.secretSuffix = suffix
+	}
+}
+
+// WithMode is a functional option that sets the
+// OracleConfig to use the specified AES mode
+func WithMode(m Mode) OracleOption {
+	return func(cfg *OracleConfig) {
+		cfg.mode = m
+	}
+}
+
 // NewOracle is a constructor for the Oracle type and returns an Oracle that encrypts
 // data using either AES ECB or AES CBC
-func NewOracle(m Mode) (Oracle, error) {
+// This oracle prepends and appends random bytes to the plaintext prior to encryption
+func NewOracle(opts ...OracleOption) (Oracle, error) {
 	// Generate random 16-byte key
 	key := make([]byte, aes.BlockSize)
 	if _, err := rand.Read(key); err != nil {
 		return nil, fmt.Errorf("key gen: %w", err)
 	}
 
-	// Random bytes for preprend and append to plaintext
-	randByteNum := mathrand.IntN(6) + 5 // random int 5-10
-	preBytes := make([]byte, randByteNum)
-	appBytes := make([]byte, randByteNum)
-	if _, err := rand.Read(preBytes); err != nil {
-		return nil, fmt.Errorf("prefix gen: %w", err)
+	// Instantiate OracleConfig
+	cfg := &OracleConfig{
+		mode: ModeECB, // defaults ECB
+		key:  key,
 	}
-	if _, err := rand.Read(appBytes); err != nil {
-		return nil, fmt.Errorf("suffix gen: %w", err)
+
+	// Apply options
+	for _, opt := range opts {
+		opt(cfg)
 	}
 
 	// Return an Oracle closure
 	return func(plaintext []byte) ([]byte, Mode, error) {
+		// Create prefix if specified
+		var prefix []byte
+		if cfg.randomPrefix {
+			// Random bytes for preprend and append to plaintext
+			prefixLen := mathrand.IntN(6) + 5 // random int 5-10
+			prefix = make([]byte, prefixLen)
+			// appBytes := make([]byte, randByteNum)
+			if _, err := rand.Read(prefix); err != nil {
+				return nil, 0, fmt.Errorf("prefix gen: %w", err)
+			}
+
+		}
+
+		// Create suffix if specified
+		var suffix []byte
+		if cfg.randomPrefix {
+			// Random bytes for preprend and append to plaintext
+			suffixLen := mathrand.IntN(6) + 5 // random int 5-10
+			suffix = make([]byte, suffixLen)
+			// appBytes := make([]byte, randByteNum)
+			if _, err := rand.Read(suffix); err != nil {
+				return nil, 0, fmt.Errorf("prefix gen: %w", err)
+			}
+
+		}
+
 		// Generate new plaintext slice
-		ptBytes := make([]byte, 0, len(plaintext)+2*randByteNum)
-		ptBytes = append(ptBytes, preBytes...)
+		ptBytes := make([]byte, 0, len(prefix)+len(plaintext)+len(suffix)+len(cfg.secretSuffix))
+		ptBytes = append(ptBytes, prefix...)
 		ptBytes = append(ptBytes, plaintext...)
-		ptBytes = append(ptBytes, appBytes...)
+		ptBytes = append(ptBytes, suffix...)
+		ptBytes = append(ptBytes, cfg.secretSuffix...)
 
 		// Logic to handle random mode selection for ModeRandom
-		chosenMode := m
-		if m == ModeRandom {
+		chosenMode := cfg.mode
+		if cfg.mode == ModeRandom {
 			// Random choice of 0 or 1 to determine AES ECB/CBC
 			selection := mathrand.IntN(2)
 			if selection == 0 {
@@ -77,22 +150,6 @@ func NewOracle(m Mode) (Oracle, error) {
 		ciphertext, err := encryptor(key, ptBytes)
 		return ciphertext, chosenMode, err
 	}, nil
-}
-
-// NewECBOracle is an oracle strictly for byte at a time ECB decryption
-// It removes random pre and appended bytes and simply appends the secret suffix
-// prior to encryption
-func NewECBOracle(secretSuffix []byte) Oracle {
-	// generate key
-	key := make([]byte, aes.BlockSize)
-	rand.Read(key)
-
-	// return the simplified oracle closure
-	return func(pt []byte) ([]byte, Mode, error) {
-		data := append(pt, secretSuffix...)
-		ct, err := crypto.EncryptAESECB(key, data)
-		return ct, ModeECB, err
-	}
 }
 
 // String is a helper function that returns the associated string for a given Mode
