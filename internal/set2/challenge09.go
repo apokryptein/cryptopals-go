@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/apokryptein/cryptopals-go/internal/crypto"
+	"github.com/apokryptein/cryptopals-go/crypto"
 )
 
 func Challenge09(plaintext string, blockSize int) ([]byte, error) {

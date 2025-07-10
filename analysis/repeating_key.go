@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/apokryptein/cryptopals-go/internal/crypto"
+	"github.com/apokryptein/cryptopals-go/crypto"
 )
 
 func BreakRepeatingKeyXOR(ciphertext []byte) (key []byte, plaintext []byte, err error) {

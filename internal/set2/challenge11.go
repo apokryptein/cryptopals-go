@@ -4,7 +4,7 @@ import (
 	"crypto/aes"
 	"fmt"
 
-	"github.com/apokryptein/cryptopals-go/internal/analysis"
+	"github.com/apokryptein/cryptopals-go/analysis"
 )
 
 func Challenge11(pt []byte) (mode string, result bool, err error) {

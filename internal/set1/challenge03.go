@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	analysis "github.com/apokryptein/cryptopals-go/internal/analysis"
+	analysis "github.com/apokryptein/cryptopals-go/analysis"
 )
 
 func Challenge03(messageEnc string) (key, message string, score float64, err error) {

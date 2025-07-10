@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/apokryptein/cryptopals-go/internal/crypto"
-	"github.com/apokryptein/cryptopals-go/internal/encoding"
+	"github.com/apokryptein/cryptopals-go/crypto"
+	"github.com/apokryptein/cryptopals-go/encoding"
 )
 
 func Challenge13() (*encoding.Profile, error) {

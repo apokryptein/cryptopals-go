@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/apokryptein/cryptopals-go/internal/analysis"
+	"github.com/apokryptein/cryptopals-go/analysis"
 )
 
 func Challenge04(filePath string) (encData string, decData string, key string, err error) {

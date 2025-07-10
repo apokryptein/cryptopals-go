@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 
-	"github.com/apokryptein/cryptopals-go/internal/analysis"
+	"github.com/apokryptein/cryptopals-go/analysis"
 )
 
 func Challenge12() ([]byte, error) {

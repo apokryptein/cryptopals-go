@@ -2,7 +2,7 @@
 package set1
 
 import (
-	"github.com/apokryptein/cryptopals-go/internal/encoding"
+	"github.com/apokryptein/cryptopals-go/encoding"
 )
 
 func Challenge01(hexString string) (string, error) {

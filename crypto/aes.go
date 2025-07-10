@@ -5,7 +5,7 @@ import (
 	"crypto/aes"
 	"fmt"
 
-	"github.com/apokryptein/cryptopals-go/internal/encoding"
+	"github.com/apokryptein/cryptopals-go/encoding"
 )
 
 // DecryptAESECB implements AES Electronic Code Block (ECB) decryption

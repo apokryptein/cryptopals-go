@@ -6,7 +6,7 @@ import (
 	"fmt"
 	mathrand "math/rand/v2"
 
-	"github.com/apokryptein/cryptopals-go/internal/crypto"
+	"github.com/apokryptein/cryptopals-go/crypto"
 )
 
 // Mode represents the desired AES encryption mode: CBC or ECB

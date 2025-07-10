@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/apokryptein/cryptopals-go/internal/crypto"
+	"github.com/apokryptein/cryptopals-go/crypto"
 )
 
 func Challenge10(filePath string) ([]byte, error) {

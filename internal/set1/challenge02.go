@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/apokryptein/cryptopals-go/internal/encoding"
+	"github.com/apokryptein/cryptopals-go/encoding"
 )
 
 func Challenge02(buf1 string, buf2 string) ([]byte, error) {

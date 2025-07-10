@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/apokryptein/cryptopals-go/internal/crypto"
+	"github.com/apokryptein/cryptopals-go/crypto"
 )
 
 // BruteSingleByteXOR bruteforces a message enncoded/encrypted using single byte XOR using frequency analysis

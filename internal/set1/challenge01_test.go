@@ -3,7 +3,7 @@ package set1_test
 import (
 	"testing"
 
-	"github.com/apokryptein/cryptopals-go/internal/encoding"
+	"github.com/apokryptein/cryptopals-go/encoding"
 )
 
 func TestChallenge01(t *testing.T) {
