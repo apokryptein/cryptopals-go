@@ -35,10 +35,12 @@ func Challenge03(messageEnc string) (key, message string, score float64, err err
 }
 
 func runChallenge03() error {
+	// Data
 	messageEnc := "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
 	wantMessage := "Cooking MC's like a pound of bacon"
 	wantKey := "X"
 
+	// Run the challenge
 	key, message, _, err := Challenge03(messageEnc)
 	if err != nil {
 		return fmt.Errorf("key retrieval failed: %w", err)

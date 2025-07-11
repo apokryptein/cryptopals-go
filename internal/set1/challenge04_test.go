@@ -18,7 +18,7 @@ func TestChallenge04(t *testing.T) {
 		t.Errorf("unexpected error: %v\n", err)
 	}
 
-	if gotEncrypted != wantEncrypted && gotDecrypted != wantDecrypted && gotKey != wantKey {
+	if gotEncrypted != wantEncrypted || gotDecrypted != wantDecrypted || gotKey != wantKey {
 		t.Errorf("wanted: %s, %s, %s\ngot: %s, %s, %s\n", wantEncrypted, wantDecrypted, wantKey, gotEncrypted, gotDecrypted, gotKey)
 	}
 }

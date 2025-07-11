@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 
 	"github.com/apokryptein/cryptopals-go/internal/runner"
@@ -16,25 +17,26 @@ var runCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(2),
 	Example: `  cryptopals run 1 3
   cryptopals run 2 10`,
-	RunE: func(cmd *cobra.Command, args []string) error {
+	Run: func(cmd *cobra.Command, args []string) {
 		// Parse int for set
 		set, err := parseInt(args[0], "set")
 		if err != nil {
-			return err
+			fmt.Fprintf(os.Stderr, "[!] Challenge failure: %v\n", err)
+			os.Exit(1)
 		}
 
 		// Parse int for challenge
 		challenge, err := parseInt(args[1], "challenge")
 		if err != nil {
-			return err
+			fmt.Fprintf(os.Stderr, "[!] Failed to parse arguments: %v\n", err)
+			os.Exit(1)
 		}
 
 		// Call challenge's runner function
 		if err := runner.Run(set, challenge); err != nil {
-			return fmt.Errorf("failed to run challenge: %w", err)
+			fmt.Fprintf(os.Stderr, "[!] Challenge failure: %v\n", err)
+			os.Exit(1)
 		}
-
-		return nil
 	},
 }
 
