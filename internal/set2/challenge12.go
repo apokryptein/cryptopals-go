@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
+	"strings"
 
 	"github.com/apokryptein/cryptopals-go/analysis"
 	"github.com/apokryptein/cryptopals-go/internal/runner"
@@ -16,7 +17,7 @@ func init() {
 		Name:        "Byte-at-at-time ECB decryption",
 		Description: "Decrypt an unknown appended string using byte-at-a-time ECB decryption",
 		Implemented: true,
-		// Run:         runChallenge12,
+		Run:         runChallenge12,
 	})
 }
 
@@ -71,4 +72,32 @@ func Challenge12() ([]byte, error) {
 
 	// return ct, nil
 	return data, nil
+}
+
+func runChallenge12() error {
+	// Run Challenge12 and get return data
+	data, err := Challenge12()
+	if err != nil {
+		return fmt.Errorf("decryption failed: %w", err)
+	}
+
+	// What we want
+	want := `Rollin' in my 5.0
+With my rag-top down so my hair can blow
+The girlies on standby waving just to say hi
+Did you stop? No, I just drove by`
+
+	// DEBUG
+	fmt.Printf("\nDecrypted: %s\n", data)
+	fmt.Printf("Expected:  %s\n\n", want)
+
+	// See if we got what we wanted
+	if !strings.Contains(string(data), want) {
+		return fmt.Errorf("result doesn't match expected value")
+	}
+
+	// Alert
+	fmt.Println("[i] Challenge passed")
+
+	return nil
 }

@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/apokryptein/cryptopals-go/crypto"
@@ -18,7 +19,7 @@ func init() {
 		Name:        "Implement CBC mode",
 		Description: "Implement AES using Cipher Block Chaining (CBC) mode",
 		Implemented: true,
-		// Run:         runChallenge10,
+		Run:         runChallenge10,
 	})
 }
 
@@ -45,4 +46,29 @@ func Challenge10(filePath string) ([]byte, error) {
 	}
 
 	return pt, nil
+}
+
+func runChallenge10() error {
+	// Data
+	want := []byte{121, 23, 93, 16, 82, 81, 83, 91, 16, 81, 94, 84, 16, 121, 23, 93}
+
+	// Run challenge
+	result, err := Challenge10("./testdata/set2-challenge10_data.txt")
+	if err != nil {
+		return fmt.Errorf("cbc decryption failed: %w", err)
+	}
+
+	// DEBUG
+	fmt.Printf("Result:   %v\n", result[:16])
+	fmt.Printf("Expected: %v\n", want)
+
+	// Check
+	if !slices.Equal(want, result[:16]) {
+		return fmt.Errorf("result doesn't match expected value")
+	}
+
+	// Alert
+	fmt.Println("[i] Challenge passed")
+
+	return nil
 }

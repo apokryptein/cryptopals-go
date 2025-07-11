@@ -19,7 +19,7 @@ func init() {
 		Name:        "ECB cut-and-paste",
 		Description: "Modify encrypted ECB-encrypted blocks to achieve desired result",
 		Implemented: true,
-		// Run:         runChallenge13,
+		Run:         runChallenge13,
 	})
 }
 
@@ -44,7 +44,7 @@ func Challenge13() (*encoding.Profile, error) {
 
 	// Convert to encoded cookie format
 	proCookie := profile.ProfileToCookie()
-	fmt.Printf("Original Profile Cookie => %s\n\n", proCookie)
+	fmt.Printf("Original Cookie => %s\n\n", proCookie)
 
 	// Generate random 16-byte key
 	key := make([]byte, aes.BlockSize)
@@ -90,7 +90,39 @@ func Challenge13() (*encoding.Profile, error) {
 	}
 
 	// DEBUG
-	fmt.Printf("=== Forged Profile ===\n%s\n\n", string(jsonForged))
+	fmt.Printf("=== Forged Profile ===\n%s\n", string(jsonForged))
+
+	// Convert to encoded cookie format
+	decAdminCookie := profile.ProfileToCookie()
+	fmt.Printf("Admin Cookie => %s\n\n", decAdminCookie)
 
 	return forgedProfile, nil
+}
+
+func runChallenge13() error {
+	// Run challenge
+	forgedProfile, err := Challenge13()
+	if err != nil {
+		return fmt.Errorf("ecb cut-and-paste failed: %w", err)
+	}
+
+	// Profile cookie that we want
+	want := "email=foo@bar.com&uid=10&role=admin"
+
+	// Profile cookit that we got
+	have := forgedProfile.ProfileToCookie()
+
+	// DEBUG
+	fmt.Printf("Cookie:          %s\n", have)
+	fmt.Printf("Expected cookie: %s\n", want)
+
+	// Check result
+	if want != have {
+		return fmt.Errorf("result doesn't match expected value")
+	}
+
+	// Alert
+	fmt.Println("[i] Challenge passed")
+
+	return nil
 }
