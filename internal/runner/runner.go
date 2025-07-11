@@ -47,3 +47,29 @@ func GetAll() []*Challenge {
 
 	return all
 }
+
+// Run pulls and runs a challenge based on provided set and challenge numbers
+func Run(set, challenge int) error {
+	mu.RLock()
+	defer mu.RUnlock()
+
+	// Build key
+	key := fmt.Sprintf("%d-%d", set, challenge)
+
+	// Get challenge and ensure it exists
+	c, exists := challenges[key]
+	if !exists {
+		return fmt.Errorf("challenge %d-%d not found", set, challenge)
+	}
+
+	// Check for implementation status
+	if !c.Implemented {
+		return fmt.Errorf("challenge %d-%d not yet implemented", set, challenge)
+	}
+
+	fmt.Printf("\n=== Set %d, Challenge %d: %s ===\n", c.Set, c.Number, c.Name)
+	fmt.Println()
+
+	// Run the challenge
+	return c.Run()
+}
