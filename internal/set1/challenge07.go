@@ -7,7 +7,19 @@ import (
 	"strings"
 
 	"github.com/apokryptein/cryptopals-go/crypto"
+	"github.com/apokryptein/cryptopals-go/internal/runner"
 )
+
+func init() {
+	runner.Register(&runner.Challenge{
+		Set:         1,
+		Number:      7,
+		Name:        "AES in ECB mode",
+		Description: "Implementation of AES ECB decryption",
+		Implemented: true,
+		// Run:         runChallenge07,
+	})
+}
 
 func Challenge07(filePath string) (string, error) {
 	data, err := os.ReadFile(filePath)

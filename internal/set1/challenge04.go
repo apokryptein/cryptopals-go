@@ -6,7 +6,19 @@ import (
 	"os"
 
 	"github.com/apokryptein/cryptopals-go/analysis"
+	"github.com/apokryptein/cryptopals-go/internal/runner"
 )
+
+func init() {
+	runner.Register(&runner.Challenge{
+		Set:         1,
+		Number:      4,
+		Name:        "Detect single-character XOR",
+		Description: "Locate entry in file that has been encrypted using single-character XOR",
+		Implemented: true,
+		// Run:         runChallenge04,
+	})
+}
 
 func Challenge04(filePath string) (encData string, decData string, key string, err error) {
 	file, err := os.Open(filePath)

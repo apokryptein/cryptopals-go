@@ -6,7 +6,19 @@ import (
 	"os"
 
 	"github.com/apokryptein/cryptopals-go/crypto"
+	"github.com/apokryptein/cryptopals-go/internal/runner"
 )
+
+func init() {
+	runner.Register(&runner.Challenge{
+		Set:         2,
+		Number:      9,
+		Name:        "Implement PKCS#7 Padding",
+		Description: "Implement PKCS#7 Padding",
+		Implemented: true,
+		// Run:         runChallenge09,
+	})
+}
 
 func Challenge09(plaintext string, blockSize int) ([]byte, error) {
 	paddedData, err := crypto.PaddingPKCS7([]byte(plaintext), blockSize)

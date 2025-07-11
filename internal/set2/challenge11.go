@@ -5,7 +5,19 @@ import (
 	"fmt"
 
 	"github.com/apokryptein/cryptopals-go/analysis"
+	"github.com/apokryptein/cryptopals-go/internal/runner"
 )
+
+func init() {
+	runner.Register(&runner.Challenge{
+		Set:         2,
+		Number:      11,
+		Name:        "ECB/CBC detection oracle",
+		Description: "Detect the cipher block mode from ciphertext encrypted using ECB or CBC mode",
+		Implemented: true,
+		// Run:         runChallenge11,
+	})
+}
 
 func Challenge11(pt []byte) (mode string, result bool, err error) {
 	// Instantiate new oracle

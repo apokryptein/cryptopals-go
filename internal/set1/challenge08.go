@@ -7,7 +7,19 @@ import (
 	"os"
 
 	"github.com/apokryptein/cryptopals-go/analysis"
+	"github.com/apokryptein/cryptopals-go/internal/runner"
 )
+
+func init() {
+	runner.Register(&runner.Challenge{
+		Set:         1,
+		Number:      8,
+		Name:        "Detect AES in ECB mode",
+		Description: "Function to detect whether ciphertext has been encrypted using AES in ECB mode",
+		Implemented: true,
+		// Run:         runChallenge08,
+	})
+}
 
 func Challenge08(filePath string) (string, error) {
 	file, err := os.Open(filePath)

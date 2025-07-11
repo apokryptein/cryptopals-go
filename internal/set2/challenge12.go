@@ -6,7 +6,19 @@ import (
 	"fmt"
 
 	"github.com/apokryptein/cryptopals-go/analysis"
+	"github.com/apokryptein/cryptopals-go/internal/runner"
 )
+
+func init() {
+	runner.Register(&runner.Challenge{
+		Set:         2,
+		Number:      12,
+		Name:        "Byte-at-at-time ECB decryption",
+		Description: "Decrypt an unknown appended string using byte-at-a-time ECB decryption",
+		Implemented: true,
+		// Run:         runChallenge12,
+	})
+}
 
 func Challenge12() ([]byte, error) {
 	// Inital data of just A bytes

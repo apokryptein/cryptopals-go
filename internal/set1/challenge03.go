@@ -5,7 +5,19 @@ import (
 	"fmt"
 
 	analysis "github.com/apokryptein/cryptopals-go/analysis"
+	"github.com/apokryptein/cryptopals-go/internal/runner"
 )
+
+func init() {
+	runner.Register(&runner.Challenge{
+		Set:         1,
+		Number:      3,
+		Name:        "Single-byte XOR cipher",
+		Description: "Find the key and decrypt a message",
+		Implemented: true,
+		// Run:         runChallenge03,
+	})
+}
 
 func Challenge03(messageEnc string) (key, message string, score float64, err error) {
 	// Decode hex string to bytes

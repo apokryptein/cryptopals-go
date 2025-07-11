@@ -9,7 +9,19 @@ import (
 
 	"github.com/apokryptein/cryptopals-go/crypto"
 	"github.com/apokryptein/cryptopals-go/encoding"
+	"github.com/apokryptein/cryptopals-go/internal/runner"
 )
+
+func init() {
+	runner.Register(&runner.Challenge{
+		Set:         2,
+		Number:      13,
+		Name:        "ECB cut-and-paste",
+		Description: "Modify encrypted ECB-encrypted blocks to achieve desired result",
+		Implemented: true,
+		// Run:         runChallenge13,
+	})
+}
 
 func Challenge13() (*encoding.Profile, error) {
 	// UID generator
