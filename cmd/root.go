@@ -25,4 +25,13 @@ func Execute() error {
 
 func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	// Disable help subcommand
+	rootCmd.SetHelpCommand(&cobra.Command{
+		Use:    "no-help",
+		Hidden: true,
+	})
+
+	// Disable comletion subcommand
+	rootCmd.CompletionOptions.DisableDefaultCmd = true
 }

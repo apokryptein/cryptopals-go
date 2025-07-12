@@ -15,8 +15,8 @@ func init() {
 		Number:      14,
 		Name:        "Byte-at-a-time ECB decryption (harder)",
 		Description: "Decrypt an unknown appended string using byte-at-a-time ECB decryption when random bytes have been prepended to the plaintext",
-		Implemented: false,
-		// Run:         runChallenge14,
+		Implemented: true,
+		Run:         runChallenge14,
 	})
 }
 
@@ -64,6 +64,10 @@ func Challenge14() ([]byte, error) {
 		fmt.Printf("AES ECB: %v\n", ok)
 	}
 
+	// TODO: finish from here
+	// need to find alignment pad using new FindAlignment function
+	// send from pad to bygte at a time decryption function
+
 	// Decrypt using BAAT ECB decryption
 	data, err := analysis.ByteAtATimeECB(oracle, blockSize, len(appendBytes))
 	if err != nil {
@@ -72,4 +76,10 @@ func Challenge14() ([]byte, error) {
 
 	// return ct, nil
 	return data, nil
+}
+
+func runChallenge14() error {
+	// TODO: do this
+	_, err := Challenge14()
+	return err
 }

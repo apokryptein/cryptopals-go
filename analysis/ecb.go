@@ -123,3 +123,27 @@ func ByteAtATimeECB(oracle Oracle, blockSize int, secretLen int) ([]byte, error)
 
 	return recovered, nil
 }
+
+// FindRepeatingBlocks finds two adjacent equal blocks of ciphertext
+func FindRepeatingBlocks(data []byte, blockSize int) (int, bool) {
+	// Get number of blocks
+	numBlocks := len(data) / blockSize
+
+	// Iterate over contiguous blocks and check for equality
+	for i := range numBlocks {
+		block1 := data[i*blockSize : (i+1)*blockSize]
+		block2 := data[(i+1)*blockSize : (i+2)*blockSize]
+
+		// Check for equality
+		if bytes.Equal(block1, block2) {
+			return i, true
+		}
+	}
+	return -1, false
+}
+
+// FindAlignment determines the length of prepended random bytes
+func FindAlignment(oracle Oracle, blockSize int, marker byte) (padLen int, blockIndex int, err error) {
+	// TODO: finish this
+	return 0, 0, nil
+}
