@@ -5,7 +5,6 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	// TODO: set up challengre registry in challenge init to allow for registration here
 	// Setting this here to allow for challenge import
 	_ "github.com/apokryptein/cryptopals-go/internal/set1"
 	_ "github.com/apokryptein/cryptopals-go/internal/set2"

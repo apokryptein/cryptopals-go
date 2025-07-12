@@ -131,8 +131,18 @@ func FindRepeatingBlocks(data []byte, blockSize int) (int, bool) {
 
 	// Iterate over contiguous blocks and check for equality
 	for i := range numBlocks {
-		block1 := data[i*blockSize : (i+1)*blockSize]
-		block2 := data[(i+1)*blockSize : (i+2)*blockSize]
+		// Create starting point for contiguous blocks
+		start1 := i * blockSize
+		start2 := (i + 1) * blockSize
+
+		// Ensure we don't slice past the end
+		if start2+blockSize > len(data) {
+			break
+		}
+
+		// Construct blocks for comparison
+		block1 := data[start1 : (i+1)*blockSize]
+		block2 := data[start2 : (i+2)*blockSize]
 
 		// Check for equality
 		if bytes.Equal(block1, block2) {
@@ -144,6 +154,26 @@ func FindRepeatingBlocks(data []byte, blockSize int) (int, bool) {
 
 // FindAlignment determines the length of prepended random bytes
 func FindAlignment(oracle Oracle, blockSize int, marker byte) (padLen int, blockIndex int, err error) {
-	// TODO: finish this
-	return 0, 0, nil
+	// Iterate blockSize times
+	for i := range blockSize {
+		// Build padding and prepend to repeated bytes
+		padding := bytes.Repeat([]byte{marker}, i)
+		probe := append(padding, bytes.Repeat([]byte{marker}, 2*blockSize)...)
+
+		// Encrypt using oracle
+		ct, _, err := oracle(probe)
+		if err != nil {
+			return 0, 0, fmt.Errorf("oracled failed: %w", err)
+		}
+
+		// Look for repeating blocks from current position
+		index, found := FindRepeatingBlocks(ct, blockSize)
+		if found {
+			return i, index, nil
+		}
+
+	}
+
+	// If we made it here, we didn't find it
+	return 0, 0, fmt.Errorf("could not find alignment")
 }

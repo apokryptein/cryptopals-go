@@ -64,9 +64,18 @@ func Challenge14() ([]byte, error) {
 		fmt.Printf("AES ECB: %v\n", ok)
 	}
 
-	// TODO: finish from here
-	// need to find alignment pad using new FindAlignment function
-	// send from pad to bygte at a time decryption function
+	padLen, index, err := analysis.FindAlignment(oracle, blockSize, byte('A'))
+	if err != nil {
+		return nil, fmt.Errorf("alignment detection failure: %w", err)
+	}
+
+	// DEBUG
+	fmt.Printf("Pad length: %d\n", padLen)
+	fmt.Printf("Index: %d\n", index)
+
+	// TODO:
+	// create an aligned oracle to account for discovered padding length
+	// pass this to my ByteAtATimeECB
 
 	// Decrypt using BAAT ECB decryption
 	data, err := analysis.ByteAtATimeECB(oracle, blockSize, len(appendBytes))
