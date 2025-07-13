@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
+	"strings"
 
 	"github.com/apokryptein/cryptopals-go/analysis"
 	"github.com/apokryptein/cryptopals-go/internal/runner"
@@ -64,6 +65,7 @@ func Challenge14() ([]byte, error) {
 		fmt.Printf("AES ECB: %v\n", ok)
 	}
 
+	// Find alignment to account for random prepended bytes
 	padLen, index, err := analysis.FindAlignment(oracle, blockSize, byte('A'))
 	if err != nil {
 		return nil, fmt.Errorf("alignment detection failure: %w", err)
@@ -73,12 +75,11 @@ func Challenge14() ([]byte, error) {
 	fmt.Printf("Pad length: %d\n", padLen)
 	fmt.Printf("Index: %d\n", index)
 
-	// TODO:
-	// create an aligned oracle to account for discovered padding length
-	// pass this to my ByteAtATimeECB
+	// Align oracle
+	alignedOracle := analysis.WrapOracle(oracle, padLen, index, blockSize)
 
-	// Decrypt using BAAT ECB decryption
-	data, err := analysis.ByteAtATimeECB(oracle, blockSize, len(appendBytes))
+	// Decrypt using BAAT ECB decryption using aligned oracle
+	data, err := analysis.ByteAtATimeECB(alignedOracle, blockSize, len(appendBytes))
 	if err != nil {
 		return nil, fmt.Errorf("byte at a time decryption failed: %w", err)
 	}
@@ -88,7 +89,29 @@ func Challenge14() ([]byte, error) {
 }
 
 func runChallenge14() error {
-	// TODO: do this
-	_, err := Challenge14()
-	return err
+	// Run challenge
+	decData, err := Challenge14()
+	if err != nil {
+		return fmt.Errorf("decryption failed: %w", err)
+	}
+
+	// What we want
+	want := `Rollin' in my 5.0
+With my rag-top down so my hair can blow
+The girlies on standby waving just to say hi
+Did you stop? No, I just drove by`
+
+	// DEBUG
+	fmt.Printf("\nDecrypted: %s\n", decData)
+	fmt.Printf("Expected:  %s\n\n", want)
+
+	// See if we got what we wanted
+	if !strings.Contains(string(decData), want) {
+		return fmt.Errorf("result doesn't match expected value")
+	}
+
+	// Alert
+	fmt.Println("[i] Challenge passed")
+
+	return nil
 }

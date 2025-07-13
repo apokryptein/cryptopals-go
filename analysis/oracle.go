@@ -1,6 +1,7 @@
 package analysis
 
 import (
+	"bytes"
 	"crypto/aes"
 	"crypto/rand"
 	"fmt"
@@ -88,34 +89,34 @@ func NewOracle(opts ...OracleOption) (Oracle, error) {
 		opt(cfg)
 	}
 
+	// Create prefix if specified
+	var prefix []byte
+	if cfg.randomPrefix {
+		// Random bytes for preprend and append to plaintext
+		prefixLen := mathrand.IntN(6) + 5 // random int 5-10
+		prefix = make([]byte, prefixLen)
+		// appBytes := make([]byte, randByteNum)
+		if _, err := rand.Read(prefix); err != nil {
+			return nil, fmt.Errorf("prefix gen: %w", err)
+		}
+
+	}
+
+	// Create suffix if specified
+	var suffix []byte
+	if cfg.randomSuffix {
+		// Random bytes for preprend and append to plaintext
+		suffixLen := mathrand.IntN(6) + 5 // random int 5-10
+		suffix = make([]byte, suffixLen)
+		// appBytes := make([]byte, randByteNum)
+		if _, err := rand.Read(suffix); err != nil {
+			return nil, fmt.Errorf("prefix gen: %w", err)
+		}
+
+	}
+
 	// Return an Oracle closure
 	return func(plaintext []byte) ([]byte, Mode, error) {
-		// Create prefix if specified
-		var prefix []byte
-		if cfg.randomPrefix {
-			// Random bytes for preprend and append to plaintext
-			prefixLen := mathrand.IntN(6) + 5 // random int 5-10
-			prefix = make([]byte, prefixLen)
-			// appBytes := make([]byte, randByteNum)
-			if _, err := rand.Read(prefix); err != nil {
-				return nil, 0, fmt.Errorf("prefix gen: %w", err)
-			}
-
-		}
-
-		// Create suffix if specified
-		var suffix []byte
-		if cfg.randomPrefix {
-			// Random bytes for preprend and append to plaintext
-			suffixLen := mathrand.IntN(6) + 5 // random int 5-10
-			suffix = make([]byte, suffixLen)
-			// appBytes := make([]byte, randByteNum)
-			if _, err := rand.Read(suffix); err != nil {
-				return nil, 0, fmt.Errorf("prefix gen: %w", err)
-			}
-
-		}
-
 		// Generate new plaintext slice
 		ptBytes := make([]byte, 0, len(prefix)+len(plaintext)+len(suffix)+len(cfg.secretSuffix))
 		ptBytes = append(ptBytes, prefix...)
@@ -150,6 +151,31 @@ func NewOracle(opts ...OracleOption) (Oracle, error) {
 		ciphertext, err := encryptor(key, ptBytes)
 		return ciphertext, chosenMode, err
 	}, nil
+}
+
+// WrapOracle wraps a given oracle to prepend determined pad length to account
+// for random prepended bytes: used in Challenge 14
+func WrapOracle(original Oracle, padLen, blockIndex, blockSize int) Oracle {
+	return func(pt []byte) ([]byte, Mode, error) {
+		// Prepend alignment pad
+		alignedInput := append(bytes.Repeat([]byte{'A'}, padLen), pt...)
+
+		// Call original oracle
+		ct, mode, err := original(alignedInput)
+		if err != nil {
+			return nil, mode, fmt.Errorf("oracle failed: %w", err)
+		}
+
+		// Skip blocks containing random prefix
+		start := blockIndex * blockSize
+		if len(ct) < start {
+			return nil, mode, fmt.Errorf("ciphertext too short after alignment")
+		}
+
+		// return aligned slice
+		alignedCt := ct[start:]
+		return alignedCt, mode, nil
+	}
 }
 
 // String is a helper function that returns the associated string for a given Mode
