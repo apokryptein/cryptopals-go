@@ -10,7 +10,7 @@ func TestChallenge13(t *testing.T) {
 	// Run Challeng13 and get resululting profile
 	forgedProfile, err := set2.Challenge13()
 	if err != nil {
-		t.Errorf("failure running Challenge 13: %v", err)
+		t.Errorf("[ERR] failure running Challenge 13: %v", err)
 	}
 
 	// Profile cookie that we want
@@ -21,6 +21,6 @@ func TestChallenge13(t *testing.T) {
 
 	// Test
 	if want != have {
-		t.Errorf("Wanted: %s\nHave: %s\n", want, have)
+		t.Errorf("[ERR] expected: %s\nresult: %s\n", want, have)
 	}
 }
