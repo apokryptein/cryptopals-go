@@ -36,20 +36,18 @@ func Challenge16() (bool, error) {
 	}
 
 	// Build and encrypt
-	ct, err := buildCiphertext("testdata", key, iv)
+	ct, err := buildCiphertext("test;admin=true", key, iv)
 	if err != nil {
 		return false, fmt.Errorf("%w", err)
 	}
 
-	// DEBUG
-	fmt.Printf("[DEBUG] Ciphertext: %v\n", ct)
-
+	// Decrypt and validate
 	_, err = decryptAndValidate(ct, key, iv)
 	if err != nil {
 		return false, fmt.Errorf("decryption or validation failure: %w", err)
 	}
 
-	return false, nil
+	return true, nil
 }
 
 // runChallenge16 is the runner for the challenge
@@ -108,7 +106,14 @@ func decryptAndValidate(data, key, iv []byte) (bool, error) {
 		return false, fmt.Errorf("decryption failed: %w", err)
 	}
 
-	ptUnquoted := encoding.QuoteString(string(pt), map[string]string{
+	// Validate PKCS7 padding
+	ptUnpadded, err := crypto.ValidatePadding(pt, aes.BlockSize)
+	if err != nil {
+		return false, fmt.Errorf("padding validation failed: %w", err)
+	}
+
+	// Remove URL encoding
+	ptUnquoted := encoding.QuoteString(string(ptUnpadded), map[string]string{
 		"%3B": ";",
 		"%3D": "=",
 		"%20": " ",
@@ -120,8 +125,22 @@ func decryptAndValidate(data, key, iv []byte) (bool, error) {
 	// Split on ;
 	fields := strings.Split(ptUnquoted, ";")
 
+	// Convert to map
+	keyVals := make(map[string]string)
+	for _, field := range fields {
+		vals := strings.Split(field, "=")
+		keyVals[vals[0]] = vals[1]
+	}
+
 	// DEBUG
-	fmt.Printf("[DEBUG] Data: %v\n", fields)
+	fmt.Printf("[DEBUG] Data: %v\n", keyVals)
+
+	// Check for admin=true
+	_, ok := keyVals["admin"]
+
+	if ok && keyVals["admin"] == "true" {
+		return true, nil
+	}
 
 	return false, nil
 }
