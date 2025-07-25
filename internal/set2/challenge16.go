@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/apokryptein/cryptopals-go/analysis"
 	"github.com/apokryptein/cryptopals-go/crypto"
 	"github.com/apokryptein/cryptopals-go/encoding"
 	"github.com/apokryptein/cryptopals-go/internal/runner"
@@ -35,19 +36,25 @@ func Challenge16() (bool, error) {
 		return false, fmt.Errorf("IV gen: %w", err)
 	}
 
-	// Build and encrypt
-	ct, err := buildCiphertext("test;admin=true", key, iv)
+	// Instantiate oracle
+	oracle, err := analysis.NewOracle(analysis.WithMode(analysis.ModeCBC), analysis.WithIv(iv), analysis.WithKey(key))
 	if err != nil {
-		return false, fmt.Errorf("%w", err)
+		return false, fmt.Errorf("oracle failed: %w", err)
+	}
+
+	// Launch bitflip attack
+	modedCT, err := analysis.CBCBitflipAttack(oracle, buildInput, ";admin=true", aes.BlockSize)
+	if err != nil {
+		return false, fmt.Errorf("bitflip attack failed: %w", err)
 	}
 
 	// Decrypt and validate
-	_, err = decryptAndValidate(ct, key, iv)
+	ok, err := decryptAndValidate(modedCT, key, iv)
 	if err != nil {
 		return false, fmt.Errorf("decryption or validation failure: %w", err)
 	}
 
-	return true, nil
+	return ok, nil
 }
 
 // runChallenge16 is the runner for the challenge
@@ -57,44 +64,33 @@ func runChallenge16() error {
 		return fmt.Errorf("[ERR] challenge failed: %w", err)
 	}
 
+	// Check if pass
 	if pass {
-		fmt.Println("[i] Challenge passed")
+		fmt.Println("[SUCCESS] Challenge passed")
+		return nil
 	}
 
+	fmt.Println("[FAIL] Challenged failed")
 	return nil
 }
 
-// buildCiphertext builds the plaintext, encodes it as directed, and encrypts it
-// using AES CBC mode
-func buildCiphertext(data string, key []byte, iv []byte) ([]byte, error) {
+// buildInput builds the plaintext string returning the string
+// and the prefix length
+func buildInput(data string) (string, int) {
 	// Challenge data
 	prefix := "comment1=cooking%20MCs;userdata="
 	suffix := ";comment2=%20like%20a%20pound%20of%20bacon"
 
-	// Build plaintext
-	pt := fmt.Sprintf("%s%s%s", prefix, data, suffix)
-
-	ptQuoted := encoding.QuoteString(pt, map[string]string{
+	// Quote data
+	inputQuoted := encoding.QuoteString(data, map[string]string{
 		";": "%3B",
 		"=": "%3D",
 	})
 
-	// Pad the plaintext
-	ptPadded, err := crypto.PaddingPKCS7([]byte(ptQuoted), aes.BlockSize)
-	if err != nil {
-		return nil, fmt.Errorf("[ERR] padding failure: %w", err)
-	}
+	// Build plaintext
+	pt := fmt.Sprintf("%s%s%s", prefix, inputQuoted, suffix)
 
-	// DEBUG
-	fmt.Printf("[DEBUG] Plaintext: %s\n", ptPadded)
-
-	// Encrypt
-	ct, err := crypto.EncryptAESCBC(key, iv, ptPadded)
-	if err != nil {
-		return nil, fmt.Errorf("[ERR] oracle failed: %w", err)
-	}
-
-	return ct, nil
+	return pt, len(prefix)
 }
 
 // decryptAndValidate decrypts the ciphertext, parses the decrypted data,
@@ -112,28 +108,23 @@ func decryptAndValidate(data, key, iv []byte) (bool, error) {
 		return false, fmt.Errorf("padding validation failed: %w", err)
 	}
 
-	// Remove URL encoding
-	ptUnquoted := encoding.QuoteString(string(ptUnpadded), map[string]string{
-		"%3B": ";",
-		"%3D": "=",
-		"%20": " ",
-	})
-
-	// DEBUG
-	fmt.Printf("[DEBUG] Unquoted PT: %s\n", ptUnquoted)
-
 	// Split on ;
-	fields := strings.Split(ptUnquoted, ";")
+	fields := strings.Split(string(ptUnpadded), ";")
 
 	// Convert to map
 	keyVals := make(map[string]string)
 	for _, field := range fields {
-		vals := strings.Split(field, "=")
-		keyVals[vals[0]] = vals[1]
+		parts := strings.Split(field, "=")
+		if len(parts) == 2 {
+			key := parts[0]
+			val := encoding.QuoteString(parts[1], map[string]string{
+				"%3B": ";",
+				"%3D": "=",
+				"%20": " ",
+			})
+			keyVals[key] = val
+		}
 	}
-
-	// DEBUG
-	fmt.Printf("[DEBUG] Data: %v\n", keyVals)
 
 	// Check for admin=true
 	_, ok := keyVals["admin"]

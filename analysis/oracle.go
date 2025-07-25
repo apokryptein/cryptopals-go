@@ -34,6 +34,7 @@ type OracleConfig struct {
 	randomSuffix bool
 	secretSuffix []byte
 	key          []byte
+	iv           []byte
 }
 
 // WithRandomPrefix is a functional option that sets the
@@ -68,25 +69,52 @@ func WithMode(m Mode) OracleOption {
 	}
 }
 
+// WithKey is a functional option that sets the
+// OracleConfig to use the specified key
+func WithKey(key []byte) OracleOption {
+	return func(cfg *OracleConfig) {
+		cfg.key = key
+	}
+}
+
+// WithIv is a functional option that sets the
+// OracleConfig to use the specified key
+func WithIv(iv []byte) OracleOption {
+	return func(cfg *OracleConfig) {
+		cfg.iv = iv
+	}
+}
+
 // NewOracle is a constructor for the Oracle type and returns an Oracle that encrypts
 // data using either AES ECB or AES CBC
 // This oracle prepends and appends random bytes to the plaintext prior to encryption
 func NewOracle(opts ...OracleOption) (Oracle, error) {
-	// Generate random 16-byte key
-	key := make([]byte, aes.BlockSize)
-	if _, err := rand.Read(key); err != nil {
-		return nil, fmt.Errorf("key gen: %w", err)
-	}
-
 	// Instantiate OracleConfig
 	cfg := &OracleConfig{
 		mode: ModeECB, // defaults ECB
-		key:  key,
 	}
 
 	// Apply options
 	for _, opt := range opts {
 		opt(cfg)
+	}
+
+	// Generate random key if none were provided
+	if cfg.key == nil {
+		// Generate random 16-byte key
+		cfg.key = make([]byte, aes.BlockSize)
+		if _, err := rand.Read(cfg.key); err != nil {
+			return nil, fmt.Errorf("key gen: %w", err)
+		}
+	}
+
+	// Generate random IV if none were provided (CBC only)
+	if cfg.iv == nil && cfg.mode == ModeCBC {
+		// Generate random IV
+		cfg.iv = make([]byte, aes.BlockSize)
+		if _, err := rand.Read(cfg.iv); err != nil {
+			return nil, fmt.Errorf("IV gen: %w", err)
+		}
 	}
 
 	// Create prefix if specified
@@ -136,19 +164,36 @@ func NewOracle(opts ...OracleOption) (Oracle, error) {
 			}
 		}
 
+		// Check for IV in case of random mode
+		if chosenMode == ModeCBC && cfg.iv == nil {
+			// Generate random IV
+			cfg.iv = make([]byte, aes.BlockSize)
+			if _, err := rand.Read(cfg.iv); err != nil {
+				return nil, 0, fmt.Errorf("IV gen: %w", err)
+			}
+		}
+
+		// Pad plaintext
+		ptPadded, err := crypto.PaddingPKCS7(ptBytes, aes.BlockSize)
+		if err != nil {
+			return nil, 0, fmt.Errorf("padding failed: %w", err)
+		}
+
 		// Check mode and set encryptor
-		var encryptor func([]byte, []byte) ([]byte, error)
+		var encryptor func([]byte, []byte, []byte) ([]byte, error)
 		switch chosenMode {
 		case ModeCBC:
 			encryptor = cbcEncrypt
 		case ModeECB:
-			encryptor = ecbEncrypt
+			encryptor = func(k, _, ptBytes []byte) ([]byte, error) {
+				return ecbEncrypt(k, ptBytes)
+			}
 		default:
 			return nil, 0, fmt.Errorf("unsupported mode: %v", chosenMode)
 		}
 
 		// Encrypt using selected encryptor
-		ciphertext, err := encryptor(key, ptBytes)
+		ciphertext, err := encryptor(cfg.key, cfg.iv, ptPadded)
 		return ciphertext, chosenMode, err
 	}, nil
 }
@@ -184,13 +229,7 @@ func (m Mode) String() string {
 }
 
 // AES CBC helper function
-func cbcEncrypt(key, pt []byte) ([]byte, error) {
-	// Generate random IV
-	iv := make([]byte, aes.BlockSize)
-	if _, err := rand.Read(iv); err != nil {
-		return nil, fmt.Errorf("IV gen: %w", err)
-	}
-
+func cbcEncrypt(key, iv, pt []byte) ([]byte, error) {
 	return crypto.EncryptAESCBC(key, iv, pt)
 }
 
